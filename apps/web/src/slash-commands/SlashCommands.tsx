@@ -28,6 +28,7 @@ import { _t, _td, UserFriendlyError } from "../languageHandler";
 import Modal from "../Modal";
 import MultiInviter from "../utils/MultiInviter";
 import { topicToHtml } from "../HtmlUtils";
+import Markdown from "../Markdown";
 import QuestionDialog from "../components/views/dialogs/QuestionDialog";
 import WidgetUtils from "../utils/WidgetUtils";
 import { textToHtmlRainbow } from "../utils/colour";
@@ -73,7 +74,10 @@ export const Commands = [
         args: "<message>",
         description: _td("slash_command|spoiler"),
         runFn: function (cli, roomId, threadId, message = "") {
-            return successSync(ContentHelpers.makeHtmlMessage(message, `<span data-mx-spoiler>${message}</span>`));
+            // Render Markdown inside the spoiler, as a regular message would be
+            const markdown = new Markdown(message);
+            const html = markdown.isPlainText() ? message : markdown.toHTML();
+            return successSync(ContentHelpers.makeHtmlMessage(message, `<span data-mx-spoiler>${html}</span>`));
         },
         category: CommandCategories.messages,
     }),
